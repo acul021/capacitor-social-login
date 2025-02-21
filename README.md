@@ -426,6 +426,7 @@ Refresh the access token
 | **`nonce`**             | <code>string</code>   | Nonce                                                                                                |                    |
 | **`forceRefreshToken`** | <code>boolean</code>  | Force refresh token (only for Android)                                                               | <code>false</code> |
 | **`disableOneTap`**     | <code>boolean</code>  | Disable one-tap login (web only)                                                                     | <code>false</code> |
+| **`hostedDomain`**      | <code>string</code>   | Filter visible accounts by hosted domain                                                             |                    |
 
 
 #### AppleProviderOptions

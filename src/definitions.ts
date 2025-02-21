@@ -38,6 +38,11 @@ export interface InitializeOptions {
      * @since 3.1.0
      */
     mode?: 'online' | 'offline';
+    /**
+     * Filter visible accounts by hosted domain
+     * @description filter visible accounts by hosted domain
+     */
+    hostedDomain?: string;
   };
   apple?: {
     /**
@@ -249,6 +254,7 @@ export interface SocialLoginPlugin {
    * @description initialize the plugin with the required options
    */
   initialize(options: InitializeOptions): Promise<void>;
+
   /**
    * Login with the selected provider
    * @description login with the selected provider
@@ -256,11 +262,13 @@ export interface SocialLoginPlugin {
   login<T extends LoginOptions['provider']>(
     options: Extract<LoginOptions, { provider: T }>,
   ): Promise<{ provider: T; result: ProviderResponseMap[T] }>;
+
   /**
    * Logout
    * @description logout the user
    */
   logout(options: { provider: 'apple' | 'google' | 'facebook' }): Promise<void>;
+
   /**
    * IsLoggedIn
    * @description logout the user
@@ -272,6 +280,7 @@ export interface SocialLoginPlugin {
    * @description get the current access token
    */
   getAuthorizationCode(options: AuthorizationCodeOptions): Promise<AuthorizationCode>;
+
   /**
    * Refresh the access token
    * @description refresh the access token

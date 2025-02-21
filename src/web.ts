@@ -33,6 +33,7 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
   private static readonly OAUTH_STATE_KEY = 'social_login_oauth_pending';
 
   private googleClientId: string | null = null;
+  private googleHostedDomain?: string;
   private appleClientId: string | null = null;
   private googleScriptLoaded = false;
   private googleLoginType: 'online' | 'offline' = 'online';
@@ -115,6 +116,7 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
       if (options.google.mode) {
         this.googleLoginType = options.google.mode;
       }
+      this.googleHostedDomain = options.google.hostedDomain;
 
       await this.loadGoogleScript();
     }
@@ -427,12 +429,13 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
 
     if (scopes.length > 3 || this.googleLoginType === 'offline' || options.disableOneTap) {
       // If scopes are provided, directly use the traditional OAuth flow
-      return this.fallbackToTraditionalOAuth(scopes);
+      return this.fallbackToTraditionalOAuth(scopes, this.googleHostedDomain);
     }
 
     return new Promise((resolve, reject) => {
       google.accounts.id.initialize({
         client_id: this.googleClientId!,
+        hd: this.googleHostedDomain,
         callback: (response) => {
           console.log('google.accounts.id.initialize callback', response);
           if ((response as any).error) {
@@ -463,7 +466,7 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
         if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
           console.log('OneTap is not displayed or skipped');
           // Fallback to traditional OAuth if One Tap is not available
-          this.fallbackToTraditionalOAuth(scopes)
+          this.fallbackToTraditionalOAuth(scopes, this.googleHostedDomain)
             .then((r) => resolve({ provider: 'google' as T, result: r.result }))
             .catch(reject);
         } else {
@@ -563,7 +566,13 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
 
   private persistStateGoogle(accessToken: string, idToken: string) {
     try {
-      window.localStorage.setItem('capgo_social_login_google_state', JSON.stringify({ accessToken, idToken }));
+      window.localStorage.setItem(
+        'capgo_social_login_google_state',
+        JSON.stringify({
+          accessToken,
+          idToken,
+        }),
+      );
     } catch (e) {
       console.error('Cannot persist state google', e);
     }
@@ -649,10 +658,11 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
 
   private async fallbackToTraditionalOAuth<T extends 'google'>(
     scopes: string[],
+    hostedDomain?: string,
   ): Promise<{ provider: T; result: ProviderResponseMap[T] }> {
     const uniqueScopes = [...new Set([...scopes, 'openid'])];
 
-    const params = new URLSearchParams({
+    const urlParams = {
       client_id: this.googleClientId!,
       redirect_uri: window.location.href,
       response_type: this.googleLoginType === 'offline' ? 'code' : 'token id_token',
@@ -660,7 +670,12 @@ export class SocialLoginWeb extends WebPlugin implements SocialLoginPlugin {
       nonce: Math.random().toString(36).substring(2),
       include_granted_scopes: 'true',
       state: 'popup',
-    });
+    } as Record<string, string>;
+    if (hostedDomain !== undefined) {
+      urlParams['hd'] = hostedDomain;
+    }
+
+    const params = new URLSearchParams(urlParams);
 
     const url = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
     const width = 500;

@@ -11,10 +11,11 @@ class GoogleProvider {
     var forceAuthCode: Bool = false
     var additionalScopes: [String]!
     var defaultGrantedScopes = ["email", "profile", "openid"]
+    var hostedDomain: String? = nil
     var mode = GoogleProviderLoginType.ONLINE
 
-    func initialize(clientId: String, mode: GoogleProviderLoginType, serverClientId: String? = nil) {
-        configuration = GIDConfiguration(clientID: clientId, serverClientID: serverClientId)
+    func initialize(clientId: String, mode: GoogleProviderLoginType, serverClientId: String? = nil, hostedDomain: String? = nil) {
+        configuration = GIDConfiguration(clientID: clientId, serverClientID: serverClientId, hostedDomain: hostedDomain, openIDRealm: nil)
         self.mode = mode
 
         GIDSignIn.sharedInstance.configuration = configuration
