@@ -351,11 +351,11 @@ Refresh the access token
 
 #### InitializeOptions
 
-| Prop           | Type                                                                                                                   |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **`facebook`** | <code>{ appId: string; clientToken: string; }</code>                                                                   |
-| **`google`**   | <code>{ iOSClientId?: string; iOSServerClientId?: string; webClientId?: string; mode?: 'online' \| 'offline'; }</code> |
-| **`apple`**    | <code>{ clientId?: string; redirectUrl?: string; }</code>                                                              |
+| Prop           | Type                                                                                                                                          |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **`facebook`** | <code>{ appId: string; clientToken: string; }</code>                                                                                          |
+| **`google`**   | <code>{ iOSClientId?: string; iOSServerClientId?: string; webClientId?: string; mode?: 'online' \| 'offline'; hostedDomain?: string; }</code> |
+| **`apple`**    | <code>{ clientId?: string; redirectUrl?: string; }</code>                                                                                     |
 
 
 #### FacebookLoginResponse
@@ -426,7 +426,6 @@ Refresh the access token
 | **`nonce`**             | <code>string</code>   | Nonce                                                                                                |                    |
 | **`forceRefreshToken`** | <code>boolean</code>  | Force refresh token (only for Android)                                                               | <code>false</code> |
 | **`disableOneTap`**     | <code>boolean</code>  | Disable one-tap login (web only)                                                                     | <code>false</code> |
-| **`hostedDomain`**      | <code>string</code>   | Filter visible accounts by hosted domain                                                             |                    |
 
 
 #### AppleProviderOptions
